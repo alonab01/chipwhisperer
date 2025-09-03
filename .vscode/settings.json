@@ -1,6 +1,13 @@
 {
     "restructuredtext.confPath": "${workspaceFolder}\\docs",
     "files.associations": {
-        "usart_driver.h": "c"
-    }
+        "usart_driver.h": "c",
+        "simpleserial.h": "c",
+        "hal.h": "c",
+        "stdint.h": "c",
+        "io.h": "c",
+        "portpins.h": "c",
+        "iox128d4.h": "c"
+    },
+    "C_Cpp.default.compilerPath": "c:\\avr8-gnu-toolchain-win32_x86_64\\bin\\avr-gcc.exe"
 }

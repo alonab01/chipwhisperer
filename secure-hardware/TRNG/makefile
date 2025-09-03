@@ -18,7 +18,7 @@ endif
 ${info Building for platform ${PLATFORM} with CRYPTO_TARGET=$(CRYPTO_TARGET)}
 
 #Add simpleserial project to build
-include ../../../firmware/mcu/simpleserial/Makefile.simpleserial
+include ../../firmware/mcu/simpleserial/Makefile.simpleserial
 
-FIRMWAREPATH = ../../../firmware/mcu
+FIRMWAREPATH = ../../firmware/mcu
 include $(FIRMWAREPATH)/Makefile.inc

@@ -1,77 +1,61 @@
+// main.c — CW303 (ATxmega128D4): read a free-running timer and return it
+// Uses ChipWhisperer HAL + SimpleSerial (no extra libs to install).
+// Build: make PLATFORM=CW303
+
 #include "hal.h"
 #include "simpleserial.h"
+#include <avr/io.h>
 #include <stdint.h>
-#include <stdlib.h>
 
-uint8_t v_func(uint8_t* msg, uint8_t len)
-{
-    uint8_t res = 255;
-    if(len != 9) {
-        simpleserial_put('r', 1, &res);
-        return 0x00;
-    }
+// ----- Timer setup: TCC0 free-runs at CPU clock (default 32 MHz from HAL) -----
+static void timer_init(void) {
+    // Ensure timer stopped while configuring
+    TCC0.CTRLA = 0;
+    TCC0.CTRLB = 0;
+    TCC0.CTRLC = 0;
+    TCC0.CTRLD = 0;
+    TCC0.CTRLE = 0;
+    TCC0.INTCTRLA = 0;
+    TCC0.INTCTRLB = 0;
 
-    /* < traces start here > */
-    trigger_high(); 
-    ///// change here
-    uint8_t sum = 0;
-    for(int i=0; i<len; i++) {
-        uint8_t num = (msg[i] - '0');
-        num *= i % 2;  //<===
-        num = num % 10 + num / 10;  //<===
-        sum += num;
-    }
-    res = sum % 10 != 0;  //<===
-    /////
-    /* < traces end here > */
-    trigger_low(); 
+    TCC0.PER = 0xFFFF;      // 16-bit rollover
+    TCC0.CNT = 0;
+    TCC0.CTRLA = TC_CLKSEL_DIV1_gc;   // count at CPU clock (HAL sets CPU=32 MHz)
+}
 
-    
-    res = res ? 'Y' : 'N';
-    /* < send back result > */
-    simpleserial_put('r', 1, &res); 
+// ----- SimpleSerial command: host sends 'r' -> we return 2 bytes (LSB first) -----
+static uint8_t cmd_read_timer(uint8_t *data, uint16_t len) {
+    (void)data; (void)len;
+
+    uint16_t cnt = TCC0.CNT;               // sample the timer "now"
+    uint8_t out[2] = { (uint8_t)(cnt & 0xFF), (uint8_t)(cnt >> 8) };
+    simpleserial_put('r', 2, out);         // send back 2 bytes
+
     return 0x00;
 }
 
-uint8_t f_func(uint8_t* msg, uint8_t len)
-{
-    uint8_t res = 255;
-    if(len != 8) {
-        simpleserial_put('r', 1, &res);
-        return 0x00;
-    }
+// Optional: read just the LSB (handy for quick bias checks)
+static uint8_t cmd_read_lsb(uint8_t *data, uint16_t len) {
+    (void)data; (void)len;
 
-    /* < traces start here > */
-    trigger_high(); 
-    ///// change here
-    uint8_t sum = 0;
-    for(int i=0; i<len; i++) {
-        uint8_t num = (msg[i] - '0');
-        num *= i % 2 + 1;
-        num = num % 10 + num / 10;
-        sum += num;
-    }
-    res = (200-sum) % 10;  //<===
-    /////
-    /* < traces end here > */
-    trigger_low(); 
-
-    
-    res += '0';
-    /* < send back result > */
-    simpleserial_put('r', 1, &res);
+    uint8_t bit = (uint8_t)(TCC0.CNT & 1);
+    simpleserial_put('b', 1, &bit);
     return 0x00;
 }
 
 int main(void)
 {
-    platform_init();
-    init_uart();
-    trigger_setup();
-	simpleserial_init();
-    
-    simpleserial_addcmd('a', 9, v_func);
-    simpleserial_addcmd('b', 8, f_func);
-    while(1)
-        simpleserial_get();
+    platform_init();   // ChipWhisperer HAL: sets 32 MHz clock, disables JTAG, etc.
+    init_uart();       // set up UART on USARTC0 to talk SimpleSerial
+    trigger_setup();   // not strictly needed here, but keeps HAL happy
+
+    timer_init();
+
+    simpleserial_init();
+    simpleserial_addcmd('r', 0, cmd_read_timer);  // get 16-bit timer value
+    simpleserial_addcmd('b', 0, cmd_read_lsb);    // get 1-byte LSB
+
+    while (1) {
+        simpleserial_get();   // process incoming commands
+    }
 }
