@@ -4,6 +4,7 @@
 
 #include "hal.h"
 #include "simpleserial.h"
+#include <avr/iox128d4.h>
 #include <avr/io.h>
 #include <stdint.h>
 
