@@ -7,10 +7,10 @@
 
 #include "hal.h"
 #include "simpleserial.h"
-#include <avr/io.h>
+
+// #include <avr/io.h>
 #include <avr/iox128d4.h>
-#include <stdint.h>
-#include <avr/interrupt.h>
+// #include <avr/interrupt.h>
 
 /* ---------- Config ---------- */
 
@@ -51,7 +51,7 @@ static void rtc_init(void) {
     RTC.CTRL = 0;                      // stop to configure safely
     RTC.PER  = RTC_PER_VALUE;          // overflow every (PER+1) ticks
     RTC.CNT  = 0;
-    RTC.CTRL = RTC_PRESCALE;
+    RTC.CTRL = 0x05;                   //RTC_PRESCALE
 
     // Clear any pending flags
     RTC.INTFLAGS = RTC_OVFIF_bm;
@@ -76,37 +76,26 @@ static uint8_t rng_get_bit(void) {
 
 /* ---------- SimpleSerial handler ---------- */
 
-// Parse ASCII decimal in data[0..len-1]; return default if none
-static uint16_t parse_ascii_decimal(uint8_t *data, uint16_t len, uint16_t dflt) {
-    uint16_t v = 0; uint8_t seen = 0;
-    for (uint16_t i = 0; i < len; i++) {
-        uint8_t c = data[i];
-        if (c >= '0' && c <= '9') { v = (uint16_t)(v * 10 + (c - '0')); seen = 1; }
-    }
-    return seen ? v : dflt;
-}
 
-// 'r<N>' -> return N bits packed MSB-first
-static uint8_t cmd_get_bits(uint8_t *data, uint16_t len) {
-    uint16_t nbits = parse_ascii_decimal(data, len, 16);     // default: 16 bits
-    if (nbits == 0) nbits = 1;
-    if (nbits > 1024) nbits = 1024;                          // sane upper bound
 
-    uint16_t nbytes = (uint16_t)((nbits + 7) >> 3);
-    uint8_t out[128];                                        // supports up to 1024 bits
-    if (nbytes > sizeof(out)) nbytes = sizeof(out), nbits = (uint16_t)(sizeof(out) * 8);
+static uint8_t cmd_get_bits(uint8_t *data, uint8_t len) {
+    if (len < 1) return 0x00;      // safety check
 
-    // Pack MSB-first within each byte
-    for (uint16_t i = 0; i < nbytes; i++) out[i] = 0;
+    uint16_t nbits = data[0];      // first byte = number of bits requested
+    if (nbits == 0) nbits = 1;     // at least 1 bit
 
+    uint16_t nbytes = (nbits + 7) >> 3;  // ceiling(nbits/8)
+    uint8_t out[32] = {0};               // 32 bytes = 256 bits max
+
+    // Pack bits MSB-first into each byte
     for (uint16_t i = 0; i < nbits; i++) {
         uint8_t bit = rng_get_bit();
-        uint16_t bi = i >> 3;                // byte index
-        uint8_t  bp = 7 - (i & 7);           // bit position (MSB-first)
+        uint16_t bi = i >> 3;        // byte index
+        uint8_t  bp = 7 - (i & 7);   // bit position (MSB-first)
         out[bi] |= (uint8_t)(bit << bp);
     }
 
-    ss_send('r', out, nbytes);
+    simpleserial_put('r', nbytes, out);
     return 0x00;
 }
 
@@ -121,11 +110,11 @@ int main(void) {
     rtc_init();
 
     simpleserial_init();               // default baud in HAL (115200)
-    simpleserial_addcmd('r', 128, cmd_get_bits);
-
-    sei(); // (no ISRs needed; safe to enable)
+    simpleserial_addcmd('o', 1, cmd_get_bits);
 
     while (1) {
         simpleserial_get();
     }
 }
+
+
