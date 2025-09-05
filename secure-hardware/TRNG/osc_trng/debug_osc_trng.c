@@ -107,7 +107,7 @@
 #include "simpleserial.h"
 // #include <avr/iox128d4.h>
 
-#define RTC_PER_VALUE  32767   
+#define RTC_PER_VALUE  31  // overflow every 32 ticks (1 second with DIV1 prescaler)
 
 
 static void rtc_init(void) {
@@ -132,11 +132,19 @@ static void tcc0_init(void) {
 
 
 /* ---------- SimpleSerial handler ---------- */
-static uint8_t cmd_read_cnt(uint8_t *data, uint8_t len) {
+static uint8_t cmd_read_cnt_rtc(uint8_t *data, uint8_t len) {
     uint16_t cnt16 = RTC.CNT;
-    simpleserial_put('r', 2, (uint8_t *)&cnt16);
+    simpleserial_put('x', 2, (uint8_t *)&cnt16);
     return 0x00;
 }
+
+static uint8_t cmd_read_cnt_tcc0(uint8_t *data, uint8_t len) {
+    // uint16_t cnt16 = TCC0.CNT;
+    uint16_t cnt16 = 0x1234;
+    simpleserial_put('x', 2, (uint8_t *)&cnt16);
+    return 0x00;
+} 
+
 
 static uint8_t cmd_debug(uint8_t *data, uint8_t len) {
     uint8_t regs[4];
@@ -147,6 +155,28 @@ static uint8_t cmd_debug(uint8_t *data, uint8_t len) {
     simpleserial_put('d', 4, regs);
     return 0x00;
 }
+
+// Returns one random bit by waiting for the next RTC overflow
+static uint16_t rng_get_bits(void) {
+    // Wait for overflow
+    // while (!(RTC.INTFLAGS & RTC_OVFIF_bm)) { ; }
+    // RTC.INTFLAGS = RTC_OVFIF_bm;
+    uint16_t low =TCC0.CNT;
+    return low;
+
+}
+
+
+static uint8_t cmd_get_bits(uint8_t *data, uint8_t len) {
+
+    // uint16_t out = rng_get_bits();
+    uint16_t out = 0x1234;
+    simpleserial_put('x', 2, (uint8_t *)&out);
+    return 0x00;
+
+}
+
+
 
 
 /* ---------- Main ---------- */
@@ -160,8 +190,10 @@ int main(void) {
     simpleserial_init();
 
     // Register command 'o' to read counter
-    simpleserial_addcmd('o', 1, cmd_read_cnt);
+    simpleserial_addcmd('o', 0, cmd_read_cnt_rtc);
+    simpleserial_addcmd('x', 0, cmd_read_cnt_tcc0);
     simpleserial_addcmd('u', 0, cmd_debug);
+    simpleserial_addcmd('y', 0, cmd_get_bits);
 
     while (1) {
         simpleserial_get();
