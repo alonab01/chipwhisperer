@@ -1,126 +1,47 @@
-// #include <stdint.h>
-// #include "hal.h"
-// #include "simpleserial.h"
-
-
-// #define RTC_PRESCALE   RTC_PRESCALER_DIV32_gc
-// #define RTC_PER_VALUE  31
-
-// /* ---------- State ---------- */
-
-// static volatile uint16_t tcc0_last = 0;
-
-// /* ---------- Clocks & Timers ---------- */
-
-// // Free-run TCC0 @ system clock
-// static void tcc0_init(void) {
-//     TCC0.CTRLA = 0;
-//     TCC0.CTRLB = 0;
-//     TCC0.CTRLC = 0;
-//     TCC0.CTRLD = 0;
-//     TCC0.CTRLE = 0;
-//     TCC0.PER   = 0xFFFF; // the top value the counter counts up to before rolling over flow (returning to 0)
-//     TCC0.CNT   = 0;
-//     TCC0.CTRLA = TC_CLKSEL_DIV1_gc;   // count every CPU cycle
-//     tcc0_last  = TCC0.CNT;
-// }
-
-// // Init RTC from 32 kHz internal RC, no interrupts — we poll OVF
-// static void rtc_init(void) {
-//     // Enable 32 kHz RC
-//     OSC.CTRL |= OSC_RC32KEN_bm; //Turns on the internal 32 kHz RC oscillator
-//     while (!(OSC.STATUS & OSC_RC32KRDY_bm)) { ; } //We spin until the 32 kHz oscillator has stabilized.
-
-//     // Route 32 kHz RC to RTC and enable RTC clock
-//     CLK.RTCCTRL = CLK_RTCSRC_RCOSC_gc | CLK_RTCEN_bm;
-
-//     // Set prescaler and period
-//     RTC.CTRL = 0;                      // stop to configure safely
-//     RTC.PER  = RTC_PER_VALUE;          // overflow every (PER+1) ticks
-//     RTC.CNT  = 0;
-//     RTC.CTRL = RTC_PRESCALE;                   //RTC_PRESCALE
-
-//     // Clear any pending flags
-//     RTC.INTFLAGS = RTC_OVFIF_bm;
-// }
-
-// /* ---------- Random bit sampler (blocking, polled) ---------- */
-
-// // Returns one random bit by waiting for the next RTC overflow
-// static uint8_t rng_get_bit(void) {
-//     // Wait for overflow
-//     while (!(RTC.INTFLAGS & RTC_OVFIF_bm)) { ; }
-//     RTC.INTFLAGS = RTC_OVFIF_bm;
-
-//     // Measure delta on fast counter
-//     uint16_t now   = TCC0.CNT;
-//     uint16_t delta = (uint16_t)(now - tcc0_last);
-//     tcc0_last = now;
-
-//     // Use bit1 (discard LSB) as the entropy bit
-//     return (uint8_t)((delta >> 1) & 0x1);
-// }
-
-// static uint8_t cmd_get_bits(uint8_t *data, uint8_t len) {
-//     if (len < 1) return 0x00;      // safety check
-
-//     uint16_t nbits = data[0];      // first byte = number of bits requested
-//     if (nbits == 0) nbits = 1;     // at least 1 bit
-
-//     uint16_t nbytes = (nbits + 7) >> 3;  // ceiling(nbits/8)
-//     uint8_t out[32] = {0};               // 32 bytes = 256 bits max
-
-//     // Pack bits MSB-first into each byte
-//     for (uint16_t i = 0; i < nbits; i++) {
-//         // uint8_t bit = rng_get_bit();
-//         uint8_t bit = 1;
-//         uint16_t bi = i >> 3;        // byte index
-//         uint8_t  bp = 7 - (i & 7);   // bit position (MSB-first)
-//         out[bi] |= (uint8_t)(bit << bp);
-//     }
-
-//     simpleserial_put('r', nbytes, out);
-//     return 0x00;
-
-
-// }
-// int main(void) {
-//     platform_init();     // ChipWhisperer HAL
-//     init_uart();         // for SimpleSerial
-//     trigger_setup();     // not used here, but keeps default CW setup
-
-
-//     tcc0_init();
-//     rtc_init();
-
-//     simpleserial_init();               // default baud in HAL (115200)
-//     simpleserial_addcmd('o', 1, cmd_get_bits);
-
-
-//     while (1) {
-//         simpleserial_get();
-//     }
-// }
-
 #include <stdint.h>
 #include "hal.h"
 #include "simpleserial.h"
 // #include <avr/iox128d4.h>
 
-#define RTC_PER_VALUE  31  // overflow every 32 ticks (1 second with DIV1 prescaler)
+#define RTC_PER_VALUE  32767  // overflow every 32 ticks (1 second with DIV1 prescaler)
+
+// ---------- Forward Declarations ----------
+static void rtc_init(void);
+static void tcc0_init(void);
+
+static uint8_t cmd_read_cnt_rtc(uint8_t *data, uint8_t len);
+static uint8_t cmd_read_cnt_tcc0(uint8_t *data, uint8_t len);
+static uint16_t rng_get_bits(void);
+static uint8_t cmd_get_bits(uint8_t *data, uint8_t len);
+static uint8_t cmd_debug(uint8_t *data, uint8_t len);
+
+
+
 
 
 static void rtc_init(void) {
-    OSC.CTRL |= OSC_RC32KEN_bm;            // enable 32k oscillator
-    while (!(OSC.STATUS & OSC_RC32KRDY_bm));
+    // 1. Enable 32 kHz oscillator
+    OSC.CTRL |= OSC_RC32KEN_bm;              
+    while (!(OSC.STATUS & OSC_RC32KRDY_bm)); // wait until oscillator is stable
 
+    // 2. Route oscillator to RTC
     CLK.RTCCTRL = CLK_RTCSRC_RCOSC32_gc | CLK_RTCEN_bm;
 
-    RTC.PER  = RTC_PER_VALUE;                               // set top
-    RTC.CNT  = 0;                                           // reset counter
-    RTC.CTRL = RTC_PRESCALER_DIV1_gc;                       // enable and start
-    RTC.INTFLAGS = RTC_OVFIF_bm | RTC_COMPIF_bm;            // clear flags
+    // 3. Configure RTC registers (always wait for SYNCBUSY between writes)
+
+    while (RTC.STATUS & RTC_SYNCBUSY_bm);    // wait before writing PER
+    RTC.PER = RTC_PER_VALUE;                 // set top value
+
+    while (RTC.STATUS & RTC_SYNCBUSY_bm);    // wait before writing CNT
+    RTC.CNT = 0;                             // reset counter
+
+    while (RTC.STATUS & RTC_SYNCBUSY_bm);    // wait before writing CTRL
+    RTC.CTRL = RTC_PRESCALER_DIV1_gc;        // enable and start
+
+    while (RTC.STATUS & RTC_SYNCBUSY_bm);    // wait before clearing flags
+    RTC.INTFLAGS = RTC_OVFIF_bm | RTC_COMPIF_bm; // clear overflow & compare flags
 }
+
 
 
 static void tcc0_init(void) {
@@ -139,11 +60,29 @@ static uint8_t cmd_read_cnt_rtc(uint8_t *data, uint8_t len) {
 }
 
 static uint8_t cmd_read_cnt_tcc0(uint8_t *data, uint8_t len) {
-    // uint16_t cnt16 = TCC0.CNT;
-    uint16_t cnt16 = 0x1234;
+    uint16_t cnt16 = TCC0.CNT;
+    // uint16_t cnt16 = 0x1234;
     simpleserial_put('x', 2, (uint8_t *)&cnt16);
     return 0x00;
 } 
+
+// Returns one random bit by waiting for the next RTC overflow
+static uint16_t rng_get_bits(void) {
+    // Wait for overflow
+    while (!(RTC.INTFLAGS & RTC_OVFIF_bm)) { ; }
+    RTC.INTFLAGS = RTC_OVFIF_bm;
+    return TCC0.CNTL; // read low byte of TCC0 counter
+}
+
+
+static uint8_t cmd_get_bits(uint8_t *data, uint8_t len) {
+
+    uint8_t out = rng_get_bits();
+    // uint16_t oust = 0x1234;
+    simpleserial_put('x', 1, &out);
+    return 0x00;
+
+}
 
 
 static uint8_t cmd_debug(uint8_t *data, uint8_t len) {
@@ -156,25 +95,7 @@ static uint8_t cmd_debug(uint8_t *data, uint8_t len) {
     return 0x00;
 }
 
-// Returns one random bit by waiting for the next RTC overflow
-static uint16_t rng_get_bits(void) {
-    // Wait for overflow
-    // while (!(RTC.INTFLAGS & RTC_OVFIF_bm)) { ; }
-    // RTC.INTFLAGS = RTC_OVFIF_bm;
-    uint16_t low =TCC0.CNT;
-    return low;
 
-}
-
-
-static uint8_t cmd_get_bits(uint8_t *data, uint8_t len) {
-
-    // uint16_t out = rng_get_bits();
-    uint16_t out = 0x1234;
-    simpleserial_put('x', 2, (uint8_t *)&out);
-    return 0x00;
-
-}
 
 
 
@@ -193,7 +114,7 @@ int main(void) {
     simpleserial_addcmd('o', 0, cmd_read_cnt_rtc);
     simpleserial_addcmd('x', 0, cmd_read_cnt_tcc0);
     simpleserial_addcmd('u', 0, cmd_debug);
-    simpleserial_addcmd('y', 0, cmd_get_bits);
+    simpleserial_addcmd('a', 0, cmd_get_bits);
 
     while (1) {
         simpleserial_get();
