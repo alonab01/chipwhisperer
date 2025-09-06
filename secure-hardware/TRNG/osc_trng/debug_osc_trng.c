@@ -3,7 +3,9 @@
 #include "simpleserial.h"
 // #include <avr/iox128d4.h>
 
-#define RTC_PER_VALUE  32767  // overflow every 32 ticks (1 second with DIV1 prescaler)
+#define RTC_PER_VALUE  32767  // overflow every(1 second with DIV1 prescaler)
+// #define RTC_PER_VALUE  31  // overflow every 32 ticks (1 second with DIV1 prescaler)
+
 
 // ---------- Forward Declarations ----------
 static void rtc_init(void);
@@ -71,7 +73,7 @@ static uint16_t rng_get_bits(void) {
     // Wait for overflow
     while (!(RTC.INTFLAGS & RTC_OVFIF_bm)) { ; }
     RTC.INTFLAGS = RTC_OVFIF_bm;
-    return TCC0.CNTL; // read low byte of TCC0 counter
+    return TCC0.CNTL,Tcc; // read low byte of TCC0 counter
 }
 
 
