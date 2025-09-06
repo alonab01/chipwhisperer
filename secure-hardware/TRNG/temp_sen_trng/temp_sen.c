@@ -1,120 +1,69 @@
-// main.c — CW303 (ATxmega128D4): TRUERA-style single-bit sampler (no FIFO)
+// main.c — CW303 (ATxmega128D4): read internal temperature sensor via ADCA
 // Build: make PLATFORM=CW303
-// Usage from host: send "r<N>" (ASCII decimal), receive ceil(N/8) bytes tagged 'r'.
 //
-// Entropy mechanism: TCC0 free-runs at system clock. RTC uses independent 32 kHz RC.
-// For each RTC overflow, compute delta = TCC0(CNT) - last; return (delta>>1)&1 as one random bit.
+// Host usage (SimpleSerial):
+//   send 't' (no payload) -> device replies with 1 byte: 8 LSBs of the temp-sensor ADC reading.
 
 #include "hal.h"
 #include "simpleserial.h"
-
 // #include <avr/io.h>
-#include <avr/iox128d4.h>
-// #include <avr/interrupt.h>
+#include <stdint.h>
+// #include <avr/iox128d4.h>
 
-/* ---------- Config ---------- */
 
-// RTC prescaler & period -> sample rate = (32768 / prescaler) / (PER+1)
-// Here: prescaler=32, PER=31  =>  (32768/32)/32 = 32 Hz  (≈32 bits/sec)
-#define RTC_PRESCALE   RTC_PRESCALER_DIV32_gc
-#define RTC_PER_VALUE  31
+// ---------- ADC: init for internal temperature sensor ----------
+static void adc_init_temp(void) {
+    // Reference: internal 1.0V; enable temp sensor & bandgap path
+    ADCA.REFCTRL   = ADC_REFSEL_INT1V_gc | ADC_TEMPREF_bm ;
 
-/* ---------- State ---------- */
+    // 12-bit resolution (unsigned). Keep ADC clock ≈ 125 kHz for internal channels:
+    // 32 MHz / 256 = 125 kHz
+    ADCA.CTRLB     = ADC_RESOLUTION_12BIT_gc;
+    ADCA.PRESCALER = ADC_PRESCALER_DIV256_gc;
 
-static volatile uint16_t tcc0_last = 0;
+    // Channel 0: internal input mode, 1x gain
+    ADCA.CH0.CTRL    = ADC_CH_INPUTMODE_INTERNAL_gc | ADC_CH_GAIN_1X_gc;
 
-/* ---------- Clocks & Timers ---------- */
+    // Route CH0 positive MUX to internal temperature sensor
+    ADCA.CH0.MUXCTRL = ADC_CH_MUXINT_TEMP_gc;
 
-// Free-run TCC0 @ system clock
-static void tcc0_init(void) {
-    TCC0.CTRLA = 0;
-    TCC0.CTRLB = 0;
-    TCC0.CTRLC = 0;
-    TCC0.CTRLD = 0;
-    TCC0.CTRLE = 0;
-    TCC0.PER   = 0xFFFF; // the top value the counter counts up to before rolling over flow (returning to 0)
-    TCC0.CNT   = 0;
-    TCC0.CTRLA = TC_CLKSEL_DIV1_gc;   // count every CPU cycle
-    tcc0_last  = TCC0.CNT;
+    // Enable ADC
+    ADCA.CTRLA = ADC_ENABLE_bm;
+
+    // One dummy conversion after switching internal source (recommended)
+    ADCA.CH0.CTRL |= ADC_CH_START_bm;
+    while (!(ADCA.INTFLAGS & ADC_CH0IF_bm)) {;}
+    ADCA.INTFLAGS = ADC_CH0IF_bm;
 }
 
-// Init RTC from 32 kHz internal RC, no interrupts — we poll OVF
-static void rtc_init(void) {
-    // Enable 32 kHz RC
-    OSC.CTRL |= OSC_RC32KEN_bm; //Turns on the internal 32 kHz RC oscillator
-    while (!(OSC.STATUS & OSC_RC32KRDY_bm)) { ; } //We spin until the 32 kHz oscillator has stabilized.
-
-    // Route 32 kHz RC to RTC and enable RTC clock
-    CLK.RTCCTRL = CLK_RTCSRC_RCOSC_gc | CLK_RTCEN_bm;
-
-    // Set prescaler and period
-    RTC.CTRL = 0;                      // stop to configure safely
-    RTC.PER  = RTC_PER_VALUE;          // overflow every (PER+1) ticks
-    RTC.CNT  = 0;
-    RTC.CTRL = 0x05;                   //RTC_PRESCALE
-
-    // Clear any pending flags
-    RTC.INTFLAGS = RTC_OVFIF_bm;
+// Single 12-bit conversion from the temp sensor (polling)
+static  uint16_t adc_read_temp_u12(void) {
+    ADCA.CH0.CTRL |= ADC_CH_START_bm;
+    while (!(ADCA.INTFLAGS & ADC_CH0IF_bm)) {;}
+    ADCA.INTFLAGS = ADC_CH0IF_bm;    // clear flag
+    return ADCA.CH0.RES;             // 12-bit unsigned result in low bits
 }
 
-/* ---------- Random bit sampler (blocking, polled) ---------- */
-
-// Returns one random bit by waiting for the next RTC overflow
-static uint8_t rng_get_bit(void) {
-    // Wait for overflow
-    while (!(RTC.INTFLAGS & RTC_OVFIF_bm)) { ; }
-    RTC.INTFLAGS = RTC_OVFIF_bm;
-
-    // Measure delta on fast counter
-    uint16_t now   = TCC0.CNT;
-    uint16_t delta = (uint16_t)(now - tcc0_last);
-    tcc0_last = now;
-
-    // Use bit1 (discard LSB) as the entropy bit
-    return (uint8_t)((delta >> 1) & 0x1);
+// ---------- SimpleSerial callback: return 8 LSBs of temp reading ----------
+static uint8_t cmd_get_temp_bits(uint8_t* data, uint8_t len) {
+    (void)data; (void)len;
+    uint16_t r  = adc_read_temp_u12();
+    uint8_t  random_byte = (uint8_t)(r & 0xFF);
+    simpleserial_put('x',1, &random_byte);
+    return 0;
 }
-
-/* ---------- SimpleSerial handler ---------- */
-
-
-
-static uint8_t cmd_get_bits(uint8_t *data, uint8_t len) {
-    if (len < 1) return 0x00;      // safety check
-
-    uint16_t nbits = data[0];      // first byte = number of bits requested
-    if (nbits == 0) nbits = 1;     // at least 1 bit
-
-    uint16_t nbytes = (nbits + 7) >> 3;  // ceiling(nbits/8)
-    uint8_t out[32] = {0};               // 32 bytes = 256 bits max
-
-    // Pack bits MSB-first into each byte
-    for (uint16_t i = 0; i < nbits; i++) {
-        uint8_t bit = rng_get_bit();
-        uint16_t bi = i >> 3;        // byte index
-        uint8_t  bp = 7 - (i & 7);   // bit position (MSB-first)
-        out[bi] |= (uint8_t)(bit << bp);
-    }
-
-    simpleserial_put('r', nbytes, out);
-    return 0x00;
-}
-
-/* ---------- Main ---------- */
 
 int main(void) {
-    platform_init();     // ChipWhisperer HAL
-    init_uart();         // for SimpleSerial
-    trigger_setup();     // not used here, but keeps default CW setup
+    platform_init();
+    init_uart();
+    trigger_setup();   // not used here, but harmless for CW projects
 
-    tcc0_init();
-    rtc_init();
+    adc_init_temp();
 
-    simpleserial_init();               // default baud in HAL (115200)
-    simpleserial_addcmd('o', 1, cmd_get_bits);
+    simpleserial_init();
+    simpleserial_addcmd('t', 0, cmd_get_temp_bits);
 
     while (1) {
         simpleserial_get();
     }
 }
-
-
