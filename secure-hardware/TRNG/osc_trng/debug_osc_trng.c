@@ -73,7 +73,7 @@ static uint16_t rng_get_bits(void) {
     // Wait for overflow
     while (!(RTC.INTFLAGS & RTC_OVFIF_bm)) { ; }
     RTC.INTFLAGS = RTC_OVFIF_bm;
-    return TCC0.CNTL,Tcc; // read low byte of TCC0 counter
+    return TCC0.CNTL; // read low byte of TCC0 counter
 }
 
 
