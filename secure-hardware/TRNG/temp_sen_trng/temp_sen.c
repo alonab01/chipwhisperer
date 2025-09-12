@@ -2,7 +2,9 @@
 #include "hal.h"
 #include "simpleserial.h"
 #include <stdint.h>
-#include <avr/iox128d4.h>
+#include <util/delay.h>
+
+// #include <avr/iox128d4.h>
 
 
 #define CHUNK_SIZE 249 // max chunk size for simpleserial2
@@ -13,8 +15,8 @@ static inline uint16_t sample_temp_sens(void);
 static void adc_init_internal(void);
 static uint8_t rng_get_byte(void);
 static uint8_t get_random_bytes(uint8_t cmd, uint8_t scmd, uint8_t dlen, uint8_t *data);
-
-
+static uint8_t get_random_bytes_not_limted(uint8_t cmd, uint8_t scmd, uint8_t dlen, uint8_t *data);
+static uint8_t debug_adc(uint8_t cmd, uint8_t scmd, uint8_t dlen, uint8_t *data);
 
 // ---------- Bit-packer state ----------
 static uint16_t bitbuf = 0;     // holds leftover bits between samples
@@ -57,21 +59,58 @@ static void adc_init_internal(void) {
 
 
 
+// // Pack 5-bit ADC outputs into full bytes
+// static uint8_t rng_get_byte(void) {
+//     while (bits_in_buf < 8) {
+//         uint16_t raw = sample_temp_sens(); 
+//         uint8_t five = (uint8_t)(raw & 0x1F);   // keep only 5 LSBs
+//         bitbuf |= ((uint32_t)five << bits_in_buf);
+//         bits_in_buf += 5;
+//     }
+
+//     uint8_t out = (uint8_t)(bitbuf & 0xFF);
+//     bitbuf >>= 8;
+//     bits_in_buf -= 8;
+//     return out;
+
+// }
+
 // Pack 5-bit ADC outputs into full bytes
 static uint8_t rng_get_byte(void) {
-    while (bits_in_buf < 8) {
-        uint8_t five = rng_get_bits() & 0x1F;   // 5 LSBs from ADC
-        bitbuf |= ((uint32_t)five << bits_in_buf);
-        bits_in_buf += 5;
-    }
-
-    uint8_t out = (uint8_t)(bitbuf & 0xFF);
-    bitbuf >>= 8;
-    bits_in_buf -= 8;
-    return out;
+    uint8_t four1 = (uint8_t)(sample_temp_sens() & 0x0F);   // keep only 5 LSBs
+    _delay_ms(10); 
+    uint8_t four2 = (uint8_t)(sample_temp_sens() & 0x0F);   // keep only 5 LSBs
+    return (four1 << 4) | four2;
 }
 
+
+static uint8_t debug_adc(uint8_t cmd, uint8_t scmd, uint8_t dlen, uint8_t *data) {
+    // uint16_t val = sample_temp_sens()& 0x1F;
+    uint8_t val = rng_get_byte();
+    simpleserial_put('r', 1, &val);             // NOTE: header 'z', then &buf, len
+    return 0;
+}
+
+
+
 static uint8_t get_random_bytes(uint8_t cmd, uint8_t scmd, uint8_t dlen, uint8_t *data) {
+    // --- Decide how many bytes we need to interpret ---
+    uint8_t N = 0;
+    N = (uint8_t)data[0];              // 0–255
+
+    static uint8_t out[CHUNK_SIZE];
+    uint32_t sent = 0;
+    // Fill this chunk
+    for (uint16_t i = 0; i < N; i += 1) {
+        out[i] = rng_get_byte();
+    }
+    simpleserial_put('r', N, out);
+    return 0;
+}
+
+
+
+static uint8_t get_random_bytes_not_limted(uint8_t cmd, uint8_t scmd, uint8_t dlen, uint8_t *data) {
     // --- Decide how many bytes we need to interpret ---
     uint32_t N = 0;
 
@@ -117,7 +156,9 @@ int main(void) {
     adc_init_internal();
 
     simpleserial_init();
-    simpleserial_addcmd('b', 0, get_random_bytes);
+    simpleserial_addcmd('b', 1, get_random_bytes);
+    simpleserial_addcmd('l', 0, get_random_bytes_not_limted);
+    simpleserial_addcmd('c', 0, debug_adc );
 
     while (1) {
         simpleserial_get();
