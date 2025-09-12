@@ -13,6 +13,7 @@ static void tcc0_init(void);
 
 static uint8_t rng_get_byte(void);
 static uint8_t get_random_bytes(uint8_t cmd, uint8_t scmd, uint8_t dlen, uint8_t *data);
+static uint8_t get_random_bytes_not_limted(uint8_t cmd, uint8_t scmd, uint8_t dlen, uint8_t *data);
 static uint8_t debug(uint8_t cmd, uint8_t scmd, uint8_t dlen, uint8_t *data);
 
 
@@ -65,8 +66,23 @@ static uint8_t debug(uint8_t cmd, uint8_t scmd, uint8_t dlen, uint8_t *data) {
     return 0;
 }
 
-
 static uint8_t get_random_bytes(uint8_t cmd, uint8_t scmd, uint8_t dlen, uint8_t *data) {
+    // --- Decide how many bytes we need to interpret ---
+    uint8_t N = 0;
+    N = (uint8_t)data[0];              // 0–255
+
+    static uint8_t out[CHUNK_SIZE];
+    uint32_t sent = 0;
+    // Fill this chunk
+    for (uint16_t i = 0; i < N; i += 1) {
+        out[i] = rng_get_byte();
+    }
+    simpleserial_put('r', N, out);
+    return 0;
+}
+
+
+static uint8_t get_random_bytes_not_limted(uint8_t cmd, uint8_t scmd, uint8_t dlen, uint8_t *data) {
     // --- Decide how many bytes we need to interpret ---
     uint32_t N = 0;
 
@@ -114,7 +130,8 @@ int main(void) {
     tcc0_init();
     simpleserial_init();
 
-    simpleserial_addcmd('b', 0, get_random_bytes);
+    simpleserial_addcmd('b', 1, get_random_bytes);
+    simpleserial_addcmd('l', 0, get_random_bytes_not_limted);
     simpleserial_addcmd('c', 0, debug );
 
 
