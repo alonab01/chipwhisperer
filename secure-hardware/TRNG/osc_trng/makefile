@@ -4,8 +4,8 @@ TARGET = output
 # our C firmware file
 SRC += ${SOURCE}
 
-# Use simpleserial V1
-SS_VER = SS_VER_1_1
+# Use simpleserial V2
+SS_VER = SS_VER_2_1
 
 EXTRA_OPTS = NO_EXTRA_OPTS
 CFLAGS += -D$(EXTRA_OPTS)

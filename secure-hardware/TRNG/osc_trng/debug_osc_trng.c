@@ -3,7 +3,7 @@
 #include "simpleserial.h"
 // #include <avr/iox128d4.h>
 
-#define RTC_PER_VALUE  32767  // overflow every(1 second with DIV1 prescaler)
+#define RTC_PER_VALUE  20000  // overflow every(1 second with DIV1 prescaler)
 // #define RTC_PER_VALUE  31  // overflow every 32 ticks (1 second with DIV1 prescaler)
 
 
@@ -48,7 +48,7 @@ static void rtc_init(void) {
 
 static void tcc0_init(void) {
     TCC0.CTRLA = 0;      // stop timer during setup
-    TCC0.PER   = 0xFFFF; // max period (rollover at 65535)
+    TCC0.PER   = 0x00FF; // max period (rollover at 65535)
     TCC0.CNT   = 0;      // reset counter
     TCC0.CTRLA = TC_CLKSEL_DIV1_gc; // run from system clock (32 MHz)
 }
@@ -73,15 +73,23 @@ static uint16_t rng_get_bits(void) {
     // Wait for overflow
     while (!(RTC.INTFLAGS & RTC_OVFIF_bm)) { ; }
     RTC.INTFLAGS = RTC_OVFIF_bm;
-    return TCC0.CNTL; // read low byte of TCC0 counter
+    uint16_t counter_value = TCC0.CNT; 
+    TCC0.CNT = 0; // reset TCC0 counter
+    return counter_value; // read low byte of TCC0 counter
 }
 
 
 static uint8_t cmd_get_bits(uint8_t *data, uint8_t len) {
-
-    uint8_t out = rng_get_bits();
+    uint32_t num_of_bytes;
+    for(int i=0; i<len; i++) {
+        num_of_bytes = 
+        num *= i % 2 + 1;  //<=== I added +1 here
+        num = num % 10 + num / 10;  //<===
+        sum += num;
+    }
+    uint16_t out = rng_get_bits();
     // uint16_t oust = 0x1234;
-    simpleserial_put('x', 1, &out);
+    simpleserial_put('x', 2, (uint8_t *)&out);
     return 0x00;
 
 }
