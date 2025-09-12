@@ -4,13 +4,14 @@
 // #include <avr/iox128d4.h>
 
 #define RTC_PER_VALUE  20000  
+#define CHUNK_SIZE 249 // max chunk size for simpleserial2
 
 
 // ---------- Forward Declarations ----------
 static void rtc_init(void);
 static void tcc0_init(void);
 
-static uint8_t rng_get_bits(void);
+static uint8_t rng_get_byte(void);
 static uint8_t get_random_bytes(uint8_t cmd, uint8_t scmd, uint8_t dlen, uint8_t *data);
 static uint8_t debug(uint8_t cmd, uint8_t scmd, uint8_t dlen, uint8_t *data);
 
@@ -49,7 +50,7 @@ static void tcc0_init(void) {
 }
 
 // Returns one random bit by waiting for the next RTC overflow
-static uint8_t rng_get_bits(void) {
+static uint8_t rng_get_byte(void) {
     // Wait for overflow
     while (!(RTC.INTFLAGS & RTC_OVFIF_bm)) { ; }
     RTC.INTFLAGS = RTC_OVFIF_bm;
@@ -85,17 +86,15 @@ static uint8_t get_random_bytes(uint8_t cmd, uint8_t scmd, uint8_t dlen, uint8_t
     } else {
         return 1;   // invalid
     }
-
-    // --- Stream N bytes in 249-byte chunks ---
-    static uint8_t out[249];
+    uint8_t out[CHUNK_SIZE];
     uint32_t sent = 0;
 
     while (sent < N) {
-        uint16_t chunk = (N - sent > 249) ? 249 : (N - sent);
+        uint16_t chunk = (N - sent > CHUNK_SIZE) ? CHUNK_SIZE : (N - sent);
 
         // Fill this chunk
         for (uint16_t i = 0; i < chunk; i += 1) {
-            out[i] = rng_get_bits();
+            out[i] = rng_get_byte();
         }
         simpleserial_put('r', chunk, out);
         sent += chunk;
