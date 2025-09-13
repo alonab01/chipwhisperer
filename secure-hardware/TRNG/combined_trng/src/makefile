@@ -7,7 +7,7 @@ TARGET = $(OUTPUT)/combined_trng
 $(shell mkdir -p $(OUTPUT)/src)
 
 # Source files
-SRC = $(wildcard src/*.c)
+SRC = $(wildcard *.c)
 
 # Simpleserial
 SS_VER = SS_VER_2_1
@@ -24,8 +24,8 @@ endif
 $(info Building for platform $(PLATFORM) with CRYPTO_TARGET=$(CRYPTO_TARGET))
 
 # Add simpleserial project
-include ../../../firmware/mcu/simpleserial/Makefile.simpleserial
+include ../../../../firmware/mcu/simpleserial/Makefile.simpleserial
 
 # Path to CW firmware core
-FIRMWAREPATH = ../../../firmware/mcu
+FIRMWAREPATH = ../../../../firmware/mcu
 include $(FIRMWAREPATH)/Makefile.inc
