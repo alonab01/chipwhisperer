@@ -10,6 +10,12 @@
 #include <stdint.h>
 // #include <avr/iox128d4.h>
 
+#define CHUNK_SIZE 249 // max chunk size for simpleserial2
+
+static inline uint16_t adc_conv_ch0_after_mux(uint8_t muxsel);
+static void adc_init_internal(void);
+static uint8_t make_byte_vcc3_temp5(void);
+static uint8_t get_random_bytes(uint8_t cmd, uint8_t scmd, uint8_t dlen, uint8_t *data);
 
 
 
@@ -49,11 +55,20 @@ static uint8_t make_byte_vcc3_temp5(void) {
     return (uint8_t)((top3 << 5) | low5);
 }
 
-// ---------- SimpleSerial callback ----------
-static uint8_t cmd_get_mixed(uint8_t *data, uint8_t len) {
-    (void)data; (void)len;
-    uint8_t b = make_byte_vcc3_temp5();
-    simpleserial_put('t', 1, &b);             // NOTE: header 't', then &buf, len
+
+
+static uint8_t get_random_bytes(uint8_t cmd, uint8_t scmd, uint8_t dlen, uint8_t *data) {
+    // --- Decide how many bytes we need to interpret ---
+    uint8_t N = 0;
+    N = (uint8_t)data[0];              // 0–255
+
+    static uint8_t out[CHUNK_SIZE];
+    uint32_t sent = 0;
+    // Fill this chunk
+    for (uint16_t i = 0; i < N; i += 1) {
+        out[i] = make_byte_vcc3_temp5();
+    }
+    simpleserial_put('r', N, out);
     return 0;
 }
 
@@ -65,7 +80,7 @@ int main(void) {
     adc_init_internal();
 
     simpleserial_init();
-    simpleserial_addcmd('t', 0, cmd_get_mixed);
+    simpleserial_addcmd('b', 0, get_random_bytes);
 
     while (1) {
         simpleserial_get();
