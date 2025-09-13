@@ -8,6 +8,8 @@
 #include "hal.h"
 #include "simpleserial.h"
 #include <stdint.h>
+#include <util/delay.h>
+
 // #include <avr/iox128d4.h>
 
 #define CHUNK_SIZE 249 // max chunk size for simpleserial2
@@ -67,6 +69,8 @@ static uint8_t get_random_bytes(uint8_t cmd, uint8_t scmd, uint8_t dlen, uint8_t
     // Fill this chunk
     for (uint16_t i = 0; i < N; i += 1) {
         out[i] = make_byte_vcc3_temp5();
+        _delay_ms(10); 
+
     }
     simpleserial_put('r', N, out);
     return 0;

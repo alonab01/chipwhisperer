@@ -78,7 +78,7 @@ static void adc_init_internal(void) {
 // Pack 5-bit ADC outputs into full bytes
 static uint8_t rng_get_byte(void) {
     uint8_t four1 = (uint8_t)(sample_temp_sens() & 0x0F);   // keep only 5 LSBs
-    _delay_ms(10); 
+    _delay_ms(100); 
     uint8_t four2 = (uint8_t)(sample_temp_sens() & 0x0F);   // keep only 5 LSBs
     return (four1 << 4) | four2;
 }
@@ -107,6 +107,8 @@ static uint8_t get_random_bytes(uint8_t cmd, uint8_t scmd, uint8_t dlen, uint8_t
     simpleserial_put('r', N, out);
     return 0;
 }
+
+
 
 
 
