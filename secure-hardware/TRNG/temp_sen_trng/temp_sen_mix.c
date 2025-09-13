@@ -69,8 +69,7 @@ static uint8_t get_random_bytes(uint8_t cmd, uint8_t scmd, uint8_t dlen, uint8_t
     // Fill this chunk
     for (uint16_t i = 0; i < N; i += 1) {
         out[i] = make_byte_vcc3_temp5();
-        _delay_ms(10); 
-
+        _delay_ms(0.5); 
     }
     simpleserial_put('r', N, out);
     return 0;

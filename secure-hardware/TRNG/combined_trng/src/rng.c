@@ -12,10 +12,12 @@ uint8_t rng_get_byte_counter(void) {
     return counter_value;
 }
 
+
 uint8_t rng_get_byte_temp_sens(void) {
-    uint8_t four1 = (uint8_t)(sample_temp_sens(ADC_CH_MUXINT_TEMP_gc) & 0x0F);
-    _delay_ms(10);
-    uint8_t four2 = (uint8_t)(sample_temp_sens(ADC_CH_MUXINT_TEMP_gc) & 0x0F);
+    uint8_t four1 = (uint8_t)(sample_temp_sens() & 0x0F);   // keep only 5 LSBs
+    _delay_us(500); 
+    uint8_t four2 = (uint8_t)(sample_temp_sens() & 0x0F);   // keep only 5 LSBs
+    _delay_us(500); 
     return (four1 << 4) | four2;
 }
 
