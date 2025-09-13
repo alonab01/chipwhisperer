@@ -19,12 +19,20 @@ void adc_clear_existing_vars(uint8_t muxsel) {
     ADCA.CH0.MUXCTRL = muxsel;
     ADCA.CH0.CTRL |= ADC_CH_START_bm;
     while (!(ADCA.INTFLAGS & ADC_CH0IF_bm)) {}
+    ADCA.INTFLAGS = ADC_CH0IF_bm; // clear
     (void)ADCA.CH0.RES;
 }
 
-uint16_t sample_temp_sens(uint8_t muxsel) {
-    ADCA.CH0.MUXCTRL = muxsel;
+
+
+uint16_t sample_adc(uint8_t muxsel, uint8_t same_channel) {
+    if (!same_channel) {
+         adc_clear_existing_vars(muxsel);
+    }
+    // Real conversion
     ADCA.CH0.CTRL |= ADC_CH_START_bm;
     while (!(ADCA.INTFLAGS & ADC_CH0IF_bm)) {}
-    return ADCA.CH0.RES;
+    uint16_t res = ADCA.CH0.RES;
+    ADCA.INTFLAGS = ADC_CH0IF_bm; // clear
+    return res;              
 }

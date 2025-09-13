@@ -4,6 +4,10 @@
 #include "simpleserial.h"
 #include <util/delay.h>
 
+static uint16_t bitbuf = 0;     // buffer for leftover bits
+static uint8_t bits_in_buf = 0; // how many bits are currently in buffer
+
+// --- RTC/TCC0 counter jitter-based source ---
 uint8_t rng_get_byte_counter(void) {
     while (!(RTC.INTFLAGS & RTC_OVFIF_bm)) { ; }
     RTC.INTFLAGS = RTC_OVFIF_bm;
@@ -12,26 +16,29 @@ uint8_t rng_get_byte_counter(void) {
     return counter_value;
 }
 
+// --- Mixed VCC + TEMP source with buffering ---
+uint8_t rng_get_byte_vcc_temp(void) {
+    while (bits_in_buf < 8) {
+        uint16_t vcc  = sample_adc(ADC_CH_MUXINT_SCALEDVCC_gc, 0);
+        uint16_t temp = sample_adc(ADC_CH_MUXINT_TEMP_gc, 0);
 
-uint8_t rng_get_byte_temp_sens(void) {
-    uint8_t four1 = (uint8_t)(sample_temp_sens() & 0x0F);   // keep only 5 LSBs
-    _delay_us(500); 
-    uint8_t four2 = (uint8_t)(sample_temp_sens() & 0x0F);   // keep only 5 LSBs
-    _delay_us(500); 
-    return (four1 << 4) | four2;
+        // Take 3 bits from VCC, 3 bits from TEMP = 6 fresh bits
+        uint8_t newbits = (uint8_t)((vcc & 0x07) << 3) | (temp & 0x07);
+
+        // Push into bitbuf
+        bitbuf |= ((uint16_t)newbits << bits_in_buf);
+        bits_in_buf += 6;
+    }
+
+    // Extract 8 bits
+    uint8_t out = (uint8_t)(bitbuf & 0xFF);
+    bitbuf >>= 8;
+    bits_in_buf -= 8;
+
+    return out;
 }
 
-uint8_t rng_get_byte_vcc3_temp5(void) {
-    adc_clear_existing_vars(ADC_CH_MUXINT_SCALEDVCC_gc);
-    uint16_t vcc  = sample_temp_sens(ADC_CH_MUXINT_SCALEDVCC_gc);
-    adc_clear_existing_vars(ADC_CH_MUXINT_TEMP_gc);
-    uint16_t temp = sample_temp_sens(ADC_CH_MUXINT_TEMP_gc);
-
-    uint8_t top3 = (uint8_t)(vcc  & 0x07);
-    uint8_t low5 = (uint8_t)(temp & 0x1F);
-    return (uint8_t)((top3 << 5) | low5);
-}
-
+// --- Dispatcher: choose RNG source based on scmd ---
 uint8_t get_random_bytes(uint8_t cmd, uint8_t scmd, uint8_t dlen, uint8_t *data) {
     uint8_t N = data[0];
     static uint8_t out[CHUNK_SIZE];
@@ -39,8 +46,7 @@ uint8_t get_random_bytes(uint8_t cmd, uint8_t scmd, uint8_t dlen, uint8_t *data)
     for (uint16_t i = 0; i < N; i++) {
         switch (scmd) {
             case 0: out[i] = rng_get_byte_counter(); break;
-            case 1: out[i] = rng_get_byte_temp_sens(); break;
-            case 2: out[i] = rng_get_byte_vcc3_temp5(); break;
+            case 1: out[i] = rng_get_byte_vcc_temp(); break;
             default: out[i] = 0xFF; break;
         }
     }

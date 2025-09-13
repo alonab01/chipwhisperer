@@ -9,7 +9,8 @@
         "portpins.h": "c",
         "iox128d4.h": "c",
         "rng.h": "c",
-        "timers.h": "c"
+        "timers.h": "c",
+        "adc_utils.h": "c"
     },
     "C_Cpp.default.compilerPath": "c:\\avr8-gnu-toolchain-win32_x86_64\\bin\\avr-gcc.exe"
 }

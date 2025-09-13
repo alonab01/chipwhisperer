@@ -6,6 +6,6 @@
 
 void adc_init_internal(void);
 void adc_clear_existing_vars(uint8_t muxsel);
-uint16_t sample_temp_sens(uint8_t muxsel);
+uint16_t sample_adc(uint8_t muxsel, uint8_t same_channel);
 
 #endif

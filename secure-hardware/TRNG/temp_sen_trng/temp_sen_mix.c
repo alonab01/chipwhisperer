@@ -35,7 +35,7 @@ static inline uint16_t adc_conv_ch0_after_mux(uint8_t muxsel) {
     while (!(ADCA.INTFLAGS & ADC_CH0IF_bm)) {}
     uint16_t res = ADCA.CH0.RES;
     ADCA.INTFLAGS = ADC_CH0IF_bm; // clear
-    return res; return ADCA.CH0.RES;                  // read -> clears flag, keep
+    return res;               // read -> clears flag, keepS
 }
 
 // ---------- ADC init for internal sources on CH0 ----------
