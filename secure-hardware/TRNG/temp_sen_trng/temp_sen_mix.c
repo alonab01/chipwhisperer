@@ -28,10 +28,14 @@ static inline uint16_t adc_conv_ch0_after_mux(uint8_t muxsel) {
     ADCA.CH0.CTRL |= ADC_CH_START_bm;
     while (!(ADCA.INTFLAGS & ADC_CH0IF_bm)) {}
     (void)ADCA.CH0.RES;                   // read -> clears flag, discard
+    ADCA.INTFLAGS = ADC_CH0IF_bm; // clear
+
     // real conversion
     ADCA.CH0.CTRL |= ADC_CH_START_bm;
     while (!(ADCA.INTFLAGS & ADC_CH0IF_bm)) {}
-    return ADCA.CH0.RES;                  // read -> clears flag, keep
+    uint16_t res = ADCA.CH0.RES;
+    ADCA.INTFLAGS = ADC_CH0IF_bm; // clear
+    return res; return ADCA.CH0.RES;                  // read -> clears flag, keep
 }
 
 // ---------- ADC init for internal sources on CH0 ----------
@@ -52,9 +56,9 @@ static uint8_t make_byte_vcc3_temp5(void) {
     uint16_t vcc  = adc_conv_ch0_after_mux(ADC_CH_MUXINT_SCALEDVCC_gc);
     uint16_t temp = adc_conv_ch0_after_mux(ADC_CH_MUXINT_TEMP_gc);
 
-    uint8_t top3 = (uint8_t)(vcc  & 0x07);    // 3 LSBs
-    uint8_t low5 = (uint8_t)(temp & 0x1F);    // 5 LSBs
-    return (uint8_t)((top3 << 5) | low5);
+    uint8_t top3 = (uint8_t)(vcc  & 0x0F);    // 3 LSBs
+    uint8_t low5 = (uint8_t)(temp & 0x0F);    // 5 LSBs
+    return (uint8_t)((top3 << 4) | low5);
 }
 
 
