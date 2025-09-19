@@ -6,7 +6,6 @@
 #define CRC_BYTES 20  // how many bytes to feed into CRC for crc-based RNG
 
 
-void crc_feed_byte(uint8_t b);
 uint8_t rng_get_byte_counter(void);
 uint8_t rng_get_byte_vcc_temp(void);
 uint8_t rng_get_crc_byte(void);

@@ -40,21 +40,13 @@ uint8_t rng_get_byte_vcc_temp(void) {
 
     return out;
 }
-void crc_feed_byte(uint8_t b) {
-    // Wait until not busy
-    while (CRC.STATUS & CRC_BUSY_bm);
-    CRC.DATAIN = b;
-}
+
 
 uint8_t rng_get_crc_byte(void) {
 
     for (uint8_t i = 0; i < CRC_BYTES; i++) {
-        uint8_t rnd = rng_get_byte_vcc_temp();
-        crc_feed_byte(rnd);
+        CRC.DATAIN = rng_get_byte_vcc_temp();
     }
-    // Wait until finished
-    while (CRC.STATUS & CRC_BUSY_bm);
-
     // Fold all 4 bytes → 1
     return CRC.CHECKSUM0 ^ CRC.CHECKSUM1 ^ CRC.CHECKSUM2 ^ CRC.CHECKSUM3;
 }

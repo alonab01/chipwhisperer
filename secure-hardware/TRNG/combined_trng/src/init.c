@@ -30,7 +30,6 @@ void tcc0_init(void) {
 }
 
 void crc_init(void) {
-    CRC.CTRL = CRC_CRC32_bm | CRC_SOURCE_IO_gc |CRC_RESET_RESET1_gc;
-    // Wait until finished
-    while (CRC.STATUS & CRC_BUSY_bm);
+    CRC.CTRL = CRC_RESET_RESET1_gc;
+    CRC.CTRL = CRC_CRC32_bm | CRC_SOURCE_IO_gc ;
 }
