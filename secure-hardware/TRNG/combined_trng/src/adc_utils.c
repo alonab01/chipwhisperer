@@ -1,4 +1,6 @@
 #include "adc_utils.h"
+#include <avr/io.h>
+
 
 void adc_init_internal(void) {
     ADCA.CTRLA = 0;

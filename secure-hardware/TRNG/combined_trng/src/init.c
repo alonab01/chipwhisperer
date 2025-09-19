@@ -1,4 +1,7 @@
-#include "timers.h"
+#include "init.h"
+#include <avr/io.h>
+
+
 
 void rtc_init(void) {
     OSC.CTRL |= OSC_RC32KEN_bm;              
@@ -24,4 +27,10 @@ void tcc0_init(void) {
     TCC0.PER   = 0x00FF;
     TCC0.CNT   = 0;
     TCC0.CTRLA = TC_CLKSEL_DIV1_gc;
+}
+
+void crc_init(void) {
+    CRC.CTRL = CRC_CRC32_bm | CRC_SOURCE_IO_gc |CRC_RESET_RESET1_gc;
+    // Wait until finished
+    while (CRC.STATUS & CRC_BUSY_bm);
 }

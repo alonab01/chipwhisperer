@@ -1,7 +1,7 @@
 #include <stdint.h>
 #include "hal.h"
 #include "simpleserial.h"
-// #include <avr/iox128d4.h>
+#include <avr/iox128d4.h>
 
 #define RTC_PER_VALUE  20000  // overflow every(1 second with DIV1 prescaler)
 // #define RTC_PER_VALUE  31  // overflow every 32 ticks (1 second with DIV1 prescaler)

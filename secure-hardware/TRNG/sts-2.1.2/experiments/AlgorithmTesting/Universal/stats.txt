@@ -1,40 +1,16 @@
 		UNIVERSAL STATISTICAL TEST
-		---------------------------------------------
-		ERROR:  L IS OUT OF RANGE.
-		-OR- :  Q IS LESS THAN 320.000000.
-		-OR- :  Unable to allocate T.
-		UNIVERSAL STATISTICAL TEST
-		---------------------------------------------
-		ERROR:  L IS OUT OF RANGE.
-		-OR- :  Q IS LESS THAN 320.000000.
-		-OR- :  Unable to allocate T.
-		UNIVERSAL STATISTICAL TEST
-		---------------------------------------------
-		ERROR:  L IS OUT OF RANGE.
-		-OR- :  Q IS LESS THAN 320.000000.
-		-OR- :  Unable to allocate T.
-		UNIVERSAL STATISTICAL TEST
-		---------------------------------------------
-		ERROR:  L IS OUT OF RANGE.
-		-OR- :  Q IS LESS THAN 320.000000.
-		-OR- :  Unable to allocate T.
-		UNIVERSAL STATISTICAL TEST
-		---------------------------------------------
-		ERROR:  L IS OUT OF RANGE.
-		-OR- :  Q IS LESS THAN 320.000000.
-		-OR- :  Unable to allocate T.
-		UNIVERSAL STATISTICAL TEST
-		---------------------------------------------
-		ERROR:  L IS OUT OF RANGE.
-		-OR- :  Q IS LESS THAN 320.000000.
-		-OR- :  Unable to allocate T.
-		UNIVERSAL STATISTICAL TEST
-		---------------------------------------------
-		ERROR:  L IS OUT OF RANGE.
-		-OR- :  Q IS LESS THAN 320.000000.
-		-OR- :  Unable to allocate T.
-		UNIVERSAL STATISTICAL TEST
-		---------------------------------------------
-		ERROR:  L IS OUT OF RANGE.
-		-OR- :  Q IS LESS THAN 320.000000.
-		-OR- :  Unable to allocate T.
+		--------------------------------------------
+		COMPUTATIONAL INFORMATION:
+		--------------------------------------------
+		(a) L         = 6
+		(b) Q         = 640
+		(c) K         = 132693
+		(d) sum       = 692064.064903
+		(e) sigma     = 0.002682
+		(f) variance  = 2.954000
+		(g) exp_value = 5.217705
+		(h) phi       = 5.215528
+		(i) WARNING:  2 bits were discarded.
+		-----------------------------------------
+SUCCESS		p_value = 0.416884
+

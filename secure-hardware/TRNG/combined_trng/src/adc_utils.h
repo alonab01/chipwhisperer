@@ -1,7 +1,6 @@
 #ifndef ADC_UTILS_H
 #define ADC_UTILS_H
 
-#include <avr/io.h>
 #include <stdint.h>
 
 void adc_init_internal(void);

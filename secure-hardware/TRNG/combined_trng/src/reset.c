@@ -1,5 +1,5 @@
 #include "reset.h"
-
+#include <avr/io.h>    
 
 void mcu_software_reset(void) {
     CCP = CCP_IOREG_gc;          // unlock protected I/O

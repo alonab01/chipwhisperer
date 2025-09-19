@@ -1,7 +1,7 @@
 #include "hal.h"
 #include "simpleserial.h"
 #include "rng.h"
-#include "timers.h"
+#include "init.h"
 #include "adc_utils.h"
 #include "reset.h"
 
@@ -12,6 +12,7 @@ int main(void) {
     
     tcc0_init();
     rtc_init();
+    crc_init();
     adc_init_internal();
 
     simpleserial_init();
