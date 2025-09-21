@@ -4,31 +4,41 @@
 #include <util/delay.h>
 #include <avr/io.h>
 
-
 static uint16_t bitbuf = 0;     // buffer for leftover bits
 static uint8_t bits_in_buf = 0; // how many bits are currently in buffer
 
-// --- RTC/TCC0 counter jitter-based source ---
-uint8_t rng_get_byte_counter(void) {
-    while (!(RTC.INTFLAGS & RTC_OVFIF_bm)) { ; }
+uint8_t rng_get_byte_counter(void)
+{
+    // Wait for RTC overflow event
+    while (!(RTC.INTFLAGS & RTC_OVFIF_bm))
+    {
+        ;
+    }
+
+    // Clear the RTC overflow flag
     RTC.INTFLAGS = RTC_OVFIF_bm;
-    uint8_t counter_value = TCC0.CNTL; 
+
+    // Read the current TCC0 counter value and reset it
+    uint8_t counter_value = TCC0.CNTL;
     TCC0.CNT = 0;
+
+    // Return counter_value as the random byte
     return counter_value;
 }
 
-
-
-// --- Mixed VCC + TEMP source with buffering ---
-uint8_t rng_get_byte_vcc_temp(void) {
-    while (bits_in_buf < 8) {
-        uint16_t vcc  = sample_adc(ADC_CH_MUXINT_SCALEDVCC_gc, 0);
+uint8_t rng_get_byte_vcc_temp(void)
+{
+    // Sample bytes based on VCC and TEMP ADC readings
+    // We get 6 random bits per iteration (3 from VCC, 3 from TEMP)
+    while (bits_in_buf < 8)
+    {
+        uint16_t vcc = sample_adc(ADC_CH_MUXINT_SCALEDVCC_gc, 0);
         uint16_t temp = sample_adc(ADC_CH_MUXINT_TEMP_gc, 0);
 
         // Take 3 bits from VCC, 3 bits from TEMP = 6 fresh bits
         uint8_t newbits = (uint8_t)((vcc & 0x07) << 3) | (temp & 0x07);
 
-        // Push into bitbuf
+        // Push into bitbuf - saves bits for next iteration to reach a byte
         bitbuf |= ((uint16_t)newbits << bits_in_buf);
         bits_in_buf += 6;
     }
@@ -41,28 +51,40 @@ uint8_t rng_get_byte_vcc_temp(void) {
     return out;
 }
 
-
-uint8_t rng_get_crc_byte(void) {
-
-    for (uint8_t i = 0; i < CRC_BYTES; i++) {
+uint8_t rng_get_crc_byte(void)
+{
+    // Calculate the CRC
+    for (uint8_t i = 0; i < CRC_BYTES; i++)
+    {
         CRC.DATAIN = rng_get_byte_vcc_temp();
     }
-    // Fold all 4 bytes → 1
+
+    // XOR-ing all 4 bytes of the CRC result to get a single byte
     return CRC.CHECKSUM0 ^ CRC.CHECKSUM1 ^ CRC.CHECKSUM2 ^ CRC.CHECKSUM3;
 }
 
-
-// --- Dispatcher: choose RNG source based on scmd ---
-uint8_t get_random_bytes(uint8_t cmd, uint8_t scmd, uint8_t dlen, uint8_t *data) {
+uint8_t get_random_bytes(uint8_t cmd, uint8_t scmd, uint8_t dlen, uint8_t *data)
+{
+    // A simple serial command to get random bytes (based on scmd the type of the RNG)
     uint8_t N = data[0];
     static uint8_t out[CHUNK_SIZE];
 
-    for (uint16_t i = 0; i < N; i++) {
-        switch (scmd) {
-            case 0: out[i] = rng_get_byte_counter(); break;
-            case 1: out[i] = rng_get_byte_vcc_temp(); break;
-            case 2: out[i] = rng_get_crc_byte(); break;
-            default: out[i] = 0x01; break;
+    for (uint16_t i = 0; i < N; i++)
+    {
+        switch (scmd)
+        {
+        case 0:
+            out[i] = rng_get_byte_counter();
+            break;
+        case 1:
+            out[i] = rng_get_byte_vcc_temp();
+            break;
+        case 2:
+            out[i] = rng_get_crc_byte();
+            break;
+        default:
+            out[i] = 0x01;
+            break;
         }
     }
 
