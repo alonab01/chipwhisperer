@@ -3,8 +3,7 @@
 #include <stdint.h>
 
 #define CHUNK_SIZE 249
-#define CRC_BYTES 1  // how many bytes to feed into CRC for crc-based RNG
-
+#define CRC_BYTES 1 // how many bytes to feed into CRC for crc-based RNG
 
 uint8_t rng_get_byte_counter(void);
 uint8_t rng_get_byte_vcc_temp(void);
