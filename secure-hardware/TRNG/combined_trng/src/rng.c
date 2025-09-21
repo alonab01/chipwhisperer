@@ -62,7 +62,7 @@ uint8_t get_random_bytes(uint8_t cmd, uint8_t scmd, uint8_t dlen, uint8_t *data)
             case 0: out[i] = rng_get_byte_counter(); break;
             case 1: out[i] = rng_get_byte_vcc_temp(); break;
             case 2: out[i] = rng_get_crc_byte(); break;
-            default: out[i] = 0xFF; break;
+            default: out[i] = 0x01; break;
         }
     }
 

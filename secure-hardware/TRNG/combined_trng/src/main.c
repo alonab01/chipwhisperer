@@ -4,6 +4,8 @@
 #include "init.h"
 #include "adc_utils.h"
 #include "reset.h"
+#include <stdio.h>
+
 
 int main(void) {
     platform_init();
@@ -16,11 +18,12 @@ int main(void) {
     adc_init_internal();
 
     simpleserial_init();
+    simpleserial_put('r', 8, (uint8_t*)"##BOOT##");
     simpleserial_addcmd('b', 1, get_random_bytes);
     simpleserial_addcmd('x', 0, cmd_reset);         // reset
 
 
     while (1) {
         simpleserial_get();
-    }
+    }   
 }
