@@ -46,9 +46,10 @@ void tcc0_init(void)
 {
     // Configure TCC0 settings
     // TCC0 clock is clk_per which by default is the 2 MHz internal oscillator
-    OSC.CTRL |= OSC_RC32MEN_bm;                  // enable 32 MHz oscillator
-    while (!(OSC.STATUS & OSC_RC32MRDY_bm));     // wait until ready
-    CLK.CTRL = CLK_SCLKSEL_RC32M_gc; // Set system clock to 32 MHz
+    
+    // OSC.CTRL |= OSC_RC32MEN_bm;                  // enable 32 MHz oscillator
+    // while (!(OSC.STATUS & OSC_RC32MRDY_bm));     // wait until ready
+    // CLK.CTRL = CLK_SCLKSEL_RC32M_gc; // Set system clock to 32 MHz
     TCC0.CTRLA = 0;
     TCC0.PER = 0x00FF;
     TCC0.CNT = 0;
