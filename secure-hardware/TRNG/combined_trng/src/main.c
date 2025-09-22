@@ -28,7 +28,6 @@ int main(void)
     // Add our Sipmle Serial commands
     simpleserial_addcmd('b', 1, get_random_bytes);
     simpleserial_addcmd('x', 0, cmd_reset);
-    simpleserial_addcmd('c', 0, get_counter_value);
 
     while (1)
     {
