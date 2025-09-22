@@ -28,38 +28,31 @@ uint8_t rng_get_byte_counter(void)
 
 
 
-// uint8_t rng_get_byte_vcc_temp(void)
-// {
-//     // Sample bytes based on VCC and TEMP ADC readings
-//     // We get 6 random bits per iteration (3 from VCC, 3 from TEMP)
-//     while (bits_in_buf < 8)
-//     {
-//         uint16_t vcc = sample_adc(ADC_CH_MUXINT_SCALEDVCC_gc, 0);
-//         uint16_t temp = sample_adc(ADC_CH_MUXINT_TEMP_gc, 0);
-
-//         // Take 3 bits from VCC, 3 bits from TEMP = 6 fresh bits
-//         uint8_t newbits = (uint8_t)((vcc & 0x07) << 3) | (temp & 0x07);
-
-//         // Push into bitbuf - saves bits for next iteration to reach a byte
-//         bitbuf |= ((uint16_t)newbits << bits_in_buf);
-//         bits_in_buf += 6;
-//     }
-
-//     // Extract 8 bits
-//     uint8_t out = (uint8_t)(bitbuf & 0xFF);
-//     bitbuf >>= 8;
-//     bits_in_buf -= 8;
-
-//     return out;
-// }
-
 uint8_t rng_get_byte_vcc_temp(void)
 {
+    // Sample bytes based on VCC and TEMP ADC readings
+    // We get 6 random bits per iteration (3 from VCC, 3 from TEMP)
+    while (bits_in_buf < 8)
+    {
+        uint16_t vcc = sample_adc(ADC_CH_MUXINT_SCALEDVCC_gc, 0);
+        uint16_t temp = sample_adc(ADC_CH_MUXINT_TEMP_gc, 0);
+
+        // Take 3 bits from VCC, 3 bits from TEMP = 6 fresh bits
+        uint8_t newbits = (uint8_t)((vcc & 0x07) << 3) | (temp & 0x07);
+
+        // Push into bitbuf - saves bits for next iteration to reach a byte
+        bitbuf |= ((uint16_t)newbits << bits_in_buf);
+        bits_in_buf += 6;
+    }
+
     // Extract 8 bits
-    uint16_t temp = sample_adc(ADC_CH_MUXINT_TEMP_gc, 0);
-    uint8_t out = (uint8_t)(temp & 0xFF);
+    uint8_t out = (uint8_t)(bitbuf & 0xFF);
+    bitbuf >>= 8;
+    bits_in_buf -= 8;
+
     return out;
 }
+
 
 
 uint8_t rng_get_crc_byte(void)
