@@ -97,28 +97,3 @@ uint8_t get_random_bytes(uint8_t cmd, uint8_t scmd, uint8_t dlen, uint8_t *data)
 }
 
 
-uint16_t rng_get_counter(void)
-{
-    // Wait for RTC overflow event
-    while (!(RTC.INTFLAGS & RTC_OVFIF_bm))
-    {
-        ;
-    }
-
-    // Clear the RTC overflow flag
-    RTC.INTFLAGS = RTC_OVFIF_bm;
-
-    // Read the current TCC0 counter value and reset it
-    uint16_t counter_value = TCC0.CNT;
-    TCC0.CNT = 0;
-
-    // Return counter_value as the random byte
-    return counter_value;
-}
-
-uint8_t get_counter_value(uint8_t cmd, uint8_t scmd, uint8_t dlen, uint8_t *data) {
-    uint16_t v = rng_get_counter();
-    uint8_t out[2] = { (uint8_t)(v >> 8),(uint8_t)(v & 0xFF) }; // LSB first
-    simpleserial_put('r', 2, out);
-    return 0;
-}

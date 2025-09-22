@@ -50,7 +50,7 @@ void tcc0_init(void)
     while (!(OSC.STATUS & OSC_RC32MRDY_bm));     // wait until ready
     CLK.CTRL = CLK_SCLKSEL_RC32M_gc; // Set system clock to 32 MHz
     TCC0.CTRLA = 0;
-    TCC0.PER = 0x10FF;
+    TCC0.PER = 0x00FF;
     TCC0.CNT = 0;
     TCC0.CTRLA = TC_CLKSEL_DIV1_gc;
 }

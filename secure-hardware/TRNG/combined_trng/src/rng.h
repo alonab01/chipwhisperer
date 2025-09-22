@@ -10,7 +10,5 @@ uint8_t rng_get_byte_vcc_temp(void);
 uint8_t rng_get_crc_byte(void);
 uint8_t get_random_bytes(uint8_t cmd, uint8_t scmd, uint8_t dlen, uint8_t *data);
 
-uint8_t get_counter_value(uint8_t cmd, uint8_t scmd, uint8_t dlen, uint8_t *data);
-uint16_t rng_get_counter(void);
 
 #endif
