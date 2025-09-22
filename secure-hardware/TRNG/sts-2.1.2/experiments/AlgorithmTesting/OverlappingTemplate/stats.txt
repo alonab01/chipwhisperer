@@ -2,159 +2,159 @@
 		-----------------------------------------------
 		COMPUTATIONAL INFORMATION:
 		-----------------------------------------------
-		(a) n (sequence_length)      = 8000000
+		(a) n (sequence_length)      = 100000
 		(b) m (block length of 1s)   = 9
 		(c) M (length of substring)  = 1032
-		(d) N (number of substrings) = 7751
+		(d) N (number of substrings) = 96
 		(e) lambda [(M-m+1)/2^m]     = 2.000000
 		(f) eta                      = 1.000000
 		-----------------------------------------------
 		   F R E Q U E N C Y
 		  0   1   2   3   4 >=5   Chi^2   P-value  Assignment
 		-----------------------------------------------
-		2762 1442 1106 766 562 1113  5.510654 0.356779 SUCCESS
+		 31  13  18   9   8  17  4.649981 0.460071 SUCCESS
 
 		    OVERLAPPING TEMPLATE OF ALL ONES TEST
 		-----------------------------------------------
 		COMPUTATIONAL INFORMATION:
 		-----------------------------------------------
-		(a) n (sequence_length)      = 8000000
+		(a) n (sequence_length)      = 100000
 		(b) m (block length of 1s)   = 9
 		(c) M (length of substring)  = 1032
-		(d) N (number of substrings) = 7751
+		(d) N (number of substrings) = 96
 		(e) lambda [(M-m+1)/2^m]     = 2.000000
 		(f) eta                      = 1.000000
 		-----------------------------------------------
 		   F R E Q U E N C Y
 		  0   1   2   3   4 >=5   Chi^2   P-value  Assignment
 		-----------------------------------------------
-		2848 1469 1102 756 523 1053  4.603581 0.466145 SUCCESS
+		 30  14  19   7   7  19  6.997915 0.220795 SUCCESS
 
 		    OVERLAPPING TEMPLATE OF ALL ONES TEST
 		-----------------------------------------------
 		COMPUTATIONAL INFORMATION:
 		-----------------------------------------------
-		(a) n (sequence_length)      = 8000000
+		(a) n (sequence_length)      = 100000
 		(b) m (block length of 1s)   = 9
 		(c) M (length of substring)  = 1032
-		(d) N (number of substrings) = 7751
+		(d) N (number of substrings) = 96
 		(e) lambda [(M-m+1)/2^m]     = 2.000000
 		(f) eta                      = 1.000000
 		-----------------------------------------------
 		   F R E Q U E N C Y
 		  0   1   2   3   4 >=5   Chi^2   P-value  Assignment
 		-----------------------------------------------
-		2850 1448 1054 758 568 1073  2.343706 0.799827 SUCCESS
+		 41  14  14   8   4  15  3.234659 0.663859 SUCCESS
 
 		    OVERLAPPING TEMPLATE OF ALL ONES TEST
 		-----------------------------------------------
 		COMPUTATIONAL INFORMATION:
 		-----------------------------------------------
-		(a) n (sequence_length)      = 8000000
+		(a) n (sequence_length)      = 100000
 		(b) m (block length of 1s)   = 9
 		(c) M (length of substring)  = 1032
-		(d) N (number of substrings) = 7751
+		(d) N (number of substrings) = 96
 		(e) lambda [(M-m+1)/2^m]     = 2.000000
 		(f) eta                      = 1.000000
 		-----------------------------------------------
 		   F R E Q U E N C Y
 		  0   1   2   3   4 >=5   Chi^2   P-value  Assignment
 		-----------------------------------------------
-		2791 1491 1086 784 504 1095  7.404196 0.192273 SUCCESS
+		 34  18  17  10   3  14  3.213516 0.667106 SUCCESS
 
 		    OVERLAPPING TEMPLATE OF ALL ONES TEST
 		-----------------------------------------------
 		COMPUTATIONAL INFORMATION:
 		-----------------------------------------------
-		(a) n (sequence_length)      = 8000000
+		(a) n (sequence_length)      = 100000
 		(b) m (block length of 1s)   = 9
 		(c) M (length of substring)  = 1032
-		(d) N (number of substrings) = 7751
+		(d) N (number of substrings) = 96
 		(e) lambda [(M-m+1)/2^m]     = 2.000000
 		(f) eta                      = 1.000000
 		-----------------------------------------------
 		   F R E Q U E N C Y
 		  0   1   2   3   4 >=5   Chi^2   P-value  Assignment
 		-----------------------------------------------
-		2857 1366 1122 771 516 1119  7.125726 0.211457 SUCCESS
+		 35  20  11  10   8  12  1.127008 0.951685 SUCCESS
 
 		    OVERLAPPING TEMPLATE OF ALL ONES TEST
 		-----------------------------------------------
 		COMPUTATIONAL INFORMATION:
 		-----------------------------------------------
-		(a) n (sequence_length)      = 8000000
+		(a) n (sequence_length)      = 100000
 		(b) m (block length of 1s)   = 9
 		(c) M (length of substring)  = 1032
-		(d) N (number of substrings) = 7751
+		(d) N (number of substrings) = 96
 		(e) lambda [(M-m+1)/2^m]     = 2.000000
 		(f) eta                      = 1.000000
 		-----------------------------------------------
 		   F R E Q U E N C Y
 		  0   1   2   3   4 >=5   Chi^2   P-value  Assignment
 		-----------------------------------------------
-		2797 1431 1106 798 575 1044  7.137701 0.210599 SUCCESS
+		 35  17  12  10   6  16  0.701579 0.982882 SUCCESS
 
 		    OVERLAPPING TEMPLATE OF ALL ONES TEST
 		-----------------------------------------------
 		COMPUTATIONAL INFORMATION:
 		-----------------------------------------------
-		(a) n (sequence_length)      = 8000000
+		(a) n (sequence_length)      = 100000
 		(b) m (block length of 1s)   = 9
 		(c) M (length of substring)  = 1032
-		(d) N (number of substrings) = 7751
+		(d) N (number of substrings) = 96
 		(e) lambda [(M-m+1)/2^m]     = 2.000000
 		(f) eta                      = 1.000000
 		-----------------------------------------------
 		   F R E Q U E N C Y
 		  0   1   2   3   4 >=5   Chi^2   P-value  Assignment
 		-----------------------------------------------
-		2857 1472 1067 804 536 1015  8.081543 0.151799 SUCCESS
+		 43  17   9   9   6  12  3.332549 0.648862 SUCCESS
 
 		    OVERLAPPING TEMPLATE OF ALL ONES TEST
 		-----------------------------------------------
 		COMPUTATIONAL INFORMATION:
 		-----------------------------------------------
-		(a) n (sequence_length)      = 8000000
+		(a) n (sequence_length)      = 100000
 		(b) m (block length of 1s)   = 9
 		(c) M (length of substring)  = 1032
-		(d) N (number of substrings) = 7751
+		(d) N (number of substrings) = 96
 		(e) lambda [(M-m+1)/2^m]     = 2.000000
 		(f) eta                      = 1.000000
 		-----------------------------------------------
 		   F R E Q U E N C Y
 		  0   1   2   3   4 >=5   Chi^2   P-value  Assignment
 		-----------------------------------------------
-		2814 1431 1075 770 560 1101  1.247668 0.940223 SUCCESS
+		 33  19  16   5  11  12  5.909841 0.315091 SUCCESS
 
 		    OVERLAPPING TEMPLATE OF ALL ONES TEST
 		-----------------------------------------------
 		COMPUTATIONAL INFORMATION:
 		-----------------------------------------------
-		(a) n (sequence_length)      = 8000000
+		(a) n (sequence_length)      = 100000
 		(b) m (block length of 1s)   = 9
 		(c) M (length of substring)  = 1032
-		(d) N (number of substrings) = 7751
+		(d) N (number of substrings) = 96
 		(e) lambda [(M-m+1)/2^m]     = 2.000000
 		(f) eta                      = 1.000000
 		-----------------------------------------------
 		   F R E Q U E N C Y
 		  0   1   2   3   4 >=5   Chi^2   P-value  Assignment
 		-----------------------------------------------
-		2824 1467 1025 798 581 1056  8.021971 0.155029 SUCCESS
+		 29  22  25   4   5  11  16.772427 0.004952 FAILURE
 
 		    OVERLAPPING TEMPLATE OF ALL ONES TEST
 		-----------------------------------------------
 		COMPUTATIONAL INFORMATION:
 		-----------------------------------------------
-		(a) n (sequence_length)      = 8000000
+		(a) n (sequence_length)      = 100000
 		(b) m (block length of 1s)   = 9
 		(c) M (length of substring)  = 1032
-		(d) N (number of substrings) = 7751
+		(d) N (number of substrings) = 96
 		(e) lambda [(M-m+1)/2^m]     = 2.000000
 		(f) eta                      = 1.000000
 		-----------------------------------------------
 		   F R E Q U E N C Y
 		  0   1   2   3   4 >=5   Chi^2   P-value  Assignment
 		-----------------------------------------------
-		2779 1437 1148 810 533 1044  11.679508 0.039453 SUCCESS
+		 29  11  23   4  10  19  17.911472 0.003059 FAILURE
 

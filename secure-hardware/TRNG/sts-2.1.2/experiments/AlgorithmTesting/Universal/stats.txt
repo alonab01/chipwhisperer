@@ -1,160 +1,50 @@
 		UNIVERSAL STATISTICAL TEST
-		--------------------------------------------
-		COMPUTATIONAL INFORMATION:
-		--------------------------------------------
-		(a) L         = 9
-		(b) Q         = 5120
-		(c) K         = 883768
-		(d) sum       = 7226904.366375
-		(e) sigma     = 0.001193
-		(f) variance  = 3.311000
-		(g) exp_value = 8.176425
-		(h) phi       = 8.177377
-		(i) WARNING:  8 bits were discarded.
-		-----------------------------------------
-SUCCESS		p_value = 0.424647
-
+		---------------------------------------------
+		ERROR:  L IS OUT OF RANGE.
+		-OR- :  Q IS LESS THAN 320.000000.
+		-OR- :  Unable to allocate T.
 		UNIVERSAL STATISTICAL TEST
-		--------------------------------------------
-		COMPUTATIONAL INFORMATION:
-		--------------------------------------------
-		(a) L         = 9
-		(b) Q         = 5120
-		(c) K         = 883768
-		(d) sum       = 7226602.018333
-		(e) sigma     = 0.001193
-		(f) variance  = 3.311000
-		(g) exp_value = 8.176425
-		(h) phi       = 8.177035
-		(i) WARNING:  8 bits were discarded.
-		-----------------------------------------
-SUCCESS		p_value = 0.608916
-
+		---------------------------------------------
+		ERROR:  L IS OUT OF RANGE.
+		-OR- :  Q IS LESS THAN 320.000000.
+		-OR- :  Unable to allocate T.
 		UNIVERSAL STATISTICAL TEST
-		--------------------------------------------
-		COMPUTATIONAL INFORMATION:
-		--------------------------------------------
-		(a) L         = 9
-		(b) Q         = 5120
-		(c) K         = 883768
-		(d) sum       = 7225146.542917
-		(e) sigma     = 0.001193
-		(f) variance  = 3.311000
-		(g) exp_value = 8.176425
-		(h) phi       = 8.175388
-		(i) WARNING:  8 bits were discarded.
-		-----------------------------------------
-SUCCESS		p_value = 0.384939
-
+		---------------------------------------------
+		ERROR:  L IS OUT OF RANGE.
+		-OR- :  Q IS LESS THAN 320.000000.
+		-OR- :  Unable to allocate T.
 		UNIVERSAL STATISTICAL TEST
-		--------------------------------------------
-		COMPUTATIONAL INFORMATION:
-		--------------------------------------------
-		(a) L         = 9
-		(b) Q         = 5120
-		(c) K         = 883768
-		(d) sum       = 7225914.195832
-		(e) sigma     = 0.001193
-		(f) variance  = 3.311000
-		(g) exp_value = 8.176425
-		(h) phi       = 8.176257
-		(i) WARNING:  8 bits were discarded.
-		-----------------------------------------
-SUCCESS		p_value = 0.888069
-
+		---------------------------------------------
+		ERROR:  L IS OUT OF RANGE.
+		-OR- :  Q IS LESS THAN 320.000000.
+		-OR- :  Unable to allocate T.
 		UNIVERSAL STATISTICAL TEST
-		--------------------------------------------
-		COMPUTATIONAL INFORMATION:
-		--------------------------------------------
-		(a) L         = 9
-		(b) Q         = 5120
-		(c) K         = 883768
-		(d) sum       = 7228372.282867
-		(e) sigma     = 0.001193
-		(f) variance  = 3.311000
-		(g) exp_value = 8.176425
-		(h) phi       = 8.179038
-		(i) WARNING:  8 bits were discarded.
-		-----------------------------------------
-SUCCESS		p_value = 0.028478
-
+		---------------------------------------------
+		ERROR:  L IS OUT OF RANGE.
+		-OR- :  Q IS LESS THAN 320.000000.
+		-OR- :  Unable to allocate T.
 		UNIVERSAL STATISTICAL TEST
-		--------------------------------------------
-		COMPUTATIONAL INFORMATION:
-		--------------------------------------------
-		(a) L         = 9
-		(b) Q         = 5120
-		(c) K         = 883768
-		(d) sum       = 7226514.927558
-		(e) sigma     = 0.001193
-		(f) variance  = 3.311000
-		(g) exp_value = 8.176425
-		(h) phi       = 8.176937
-		(i) WARNING:  8 bits were discarded.
-		-----------------------------------------
-SUCCESS		p_value = 0.667909
-
+		---------------------------------------------
+		ERROR:  L IS OUT OF RANGE.
+		-OR- :  Q IS LESS THAN 320.000000.
+		-OR- :  Unable to allocate T.
 		UNIVERSAL STATISTICAL TEST
-		--------------------------------------------
-		COMPUTATIONAL INFORMATION:
-		--------------------------------------------
-		(a) L         = 9
-		(b) Q         = 5120
-		(c) K         = 883768
-		(d) sum       = 7226775.833865
-		(e) sigma     = 0.001193
-		(f) variance  = 3.311000
-		(g) exp_value = 8.176425
-		(h) phi       = 8.177232
-		(i) WARNING:  8 bits were discarded.
-		-----------------------------------------
-SUCCESS		p_value = 0.498738
-
+		---------------------------------------------
+		ERROR:  L IS OUT OF RANGE.
+		-OR- :  Q IS LESS THAN 320.000000.
+		-OR- :  Unable to allocate T.
 		UNIVERSAL STATISTICAL TEST
-		--------------------------------------------
-		COMPUTATIONAL INFORMATION:
-		--------------------------------------------
-		(a) L         = 9
-		(b) Q         = 5120
-		(c) K         = 883768
-		(d) sum       = 7225200.126275
-		(e) sigma     = 0.001193
-		(f) variance  = 3.311000
-		(g) exp_value = 8.176425
-		(h) phi       = 8.175449
-		(i) WARNING:  8 bits were discarded.
-		-----------------------------------------
-SUCCESS		p_value = 0.413351
-
+		---------------------------------------------
+		ERROR:  L IS OUT OF RANGE.
+		-OR- :  Q IS LESS THAN 320.000000.
+		-OR- :  Unable to allocate T.
 		UNIVERSAL STATISTICAL TEST
-		--------------------------------------------
-		COMPUTATIONAL INFORMATION:
-		--------------------------------------------
-		(a) L         = 9
-		(b) Q         = 5120
-		(c) K         = 883768
-		(d) sum       = 7224540.070205
-		(e) sigma     = 0.001193
-		(f) variance  = 3.311000
-		(g) exp_value = 8.176425
-		(h) phi       = 8.174702
-		(i) WARNING:  8 bits were discarded.
-		-----------------------------------------
-SUCCESS		p_value = 0.148726
-
+		---------------------------------------------
+		ERROR:  L IS OUT OF RANGE.
+		-OR- :  Q IS LESS THAN 320.000000.
+		-OR- :  Unable to allocate T.
 		UNIVERSAL STATISTICAL TEST
-		--------------------------------------------
-		COMPUTATIONAL INFORMATION:
-		--------------------------------------------
-		(a) L         = 9
-		(b) Q         = 5120
-		(c) K         = 883768
-		(d) sum       = 7226593.949412
-		(e) sigma     = 0.001193
-		(f) variance  = 3.311000
-		(g) exp_value = 8.176425
-		(h) phi       = 8.177026
-		(i) WARNING:  8 bits were discarded.
-		-----------------------------------------
-SUCCESS		p_value = 0.614284
-
+		---------------------------------------------
+		ERROR:  L IS OUT OF RANGE.
+		-OR- :  Q IS LESS THAN 320.000000.
+		-OR- :  Unable to allocate T.

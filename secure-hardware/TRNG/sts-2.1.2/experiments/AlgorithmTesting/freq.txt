@@ -1,15 +1,15 @@
 ________________________________________________________________________________
 
-		FILE = data/sequential/1m_bit_random_data_crc_in_firmware_1byte_80M_sequential.bin		ALPHA = 0.0100
+		FILE = data/sequential/sequential_stream3.bin		ALPHA = 0.0100
 ________________________________________________________________________________
 
-		BITSREAD = 8000000 0s = 3999015 1s = 4000985
-		BITSREAD = 8000000 0s = 3999321 1s = 4000679
-		BITSREAD = 8000000 0s = 4002845 1s = 3997155
-		BITSREAD = 8000000 0s = 4002192 1s = 3997808
-		BITSREAD = 8000000 0s = 3998643 1s = 4001357
-		BITSREAD = 8000000 0s = 4001278 1s = 3998722
-		BITSREAD = 8000000 0s = 3999246 1s = 4000754
-		BITSREAD = 8000000 0s = 3999588 1s = 4000412
-		BITSREAD = 8000000 0s = 4001108 1s = 3998892
-		BITSREAD = 8000000 0s = 3999678 1s = 4000322
+		BITSREAD = 100000 0s = 49783 1s = 50217
+		BITSREAD = 100000 0s = 49854 1s = 50146
+		BITSREAD = 100000 0s = 49891 1s = 50109
+		BITSREAD = 100000 0s = 49837 1s = 50163
+		BITSREAD = 100000 0s = 50053 1s = 49947
+		BITSREAD = 100000 0s = 50226 1s = 49774
+		BITSREAD = 100000 0s = 50213 1s = 49787
+		BITSREAD = 100000 0s = 49996 1s = 50004
+		BITSREAD = 100000 0s = 50015 1s = 49985
+		BITSREAD = 100000 0s = 49806 1s = 50194
