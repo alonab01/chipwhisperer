@@ -56,7 +56,7 @@ uint8_t rng_get_byte_counter(void)
 uint8_t rng_get_byte_vcc_temp(void)
 {
     // Extract 8 bits
-    uint16_t temp = sample_adc(ADC_CH_MUXINT_SCALEDVCC_gc, 0);
+    uint16_t temp = sample_adc(ADC_CH_MUXINT_TEMP_gc, 0);
     uint8_t out = (uint8_t)(temp & 0xFF);
     return out;
 }
